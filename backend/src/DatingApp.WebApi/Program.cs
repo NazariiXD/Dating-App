@@ -5,6 +5,7 @@ using DatingApp.Infrastructure;
 using DatingApp.Infrastructure.Data;
 using DatingApp.WebApi.Filters;
 using DatingApp.WebApi.Middlewares;
+using DatingApp.WebApi.SignalR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,9 @@ builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));
 
 builder.Services.AddCors();
+
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<PresenceTracker>();
 
 builder.Services.AddScoped<LogUserActivity>();
 
@@ -41,6 +45,9 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.MapControllers();
+app.MapHub<PresenceHub>("hubs/presence");
+app.MapHub<MessageHub>("hubs/message");
+app.MapFallbackToController("Index", "Fallback");
 
 if (app.Environment.IsDevelopment())
 {
