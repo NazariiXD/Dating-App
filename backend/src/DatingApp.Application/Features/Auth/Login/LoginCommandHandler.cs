@@ -24,7 +24,12 @@ public class LoginCommandHandler(
 
         if (user == null || user.UserName == null)
         {
-            throw new UnauthorizedAccessException("Invalid username");
+            throw new UnauthorizedAccessException("Invalid username/password");
+        }
+
+        if (!await IsPasswordValidAsync(user, loginDto.Password))
+        {
+            throw new ArgumentException("Invalid username/password");
         }
 
         var token = await tokenService.CreateToken(user);
@@ -37,5 +42,10 @@ public class LoginCommandHandler(
             Gender = user.Gender,
             PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
         };
+    }
+
+    private Task<bool> IsPasswordValidAsync(AppUser user, string password)
+    {
+        return userManager.CheckPasswordAsync(user, password);
     }
 }
